@@ -2,8 +2,13 @@ import { Shows } from "./dbConnector";
 
 export const resolvers = {
     Query: {
-        getShow: ({id}) => {
-            return new Show(id, showDB[id])
+        getShow: (root, {id}) => {
+            return new Promise((resolve, reject) => {
+                Shows.findById({_id: id}, (err, show) => {
+                    if (err) reject(err)
+                    else resolve(show)
+                })
+            })
         },
     },
 
@@ -17,7 +22,7 @@ export const resolvers = {
             });
             show.id = show._id;
 
-            return new Promise((resolve, o) => {
+            return new Promise((resolve, reject) => {
                 show.save((err) => {
                     if (err) reject(err)
                     else resolve(show)
@@ -25,15 +30,15 @@ export const resolvers = {
             })
         },
         updateShow: (root, {input}) => {
-            return new Promise((resolve, o) => {
-                Shows.findOneAndUpdate({_id: input.id}, input, {new: true}, (err, show) => {
+            return new Promise((resolve, reject) => {
+                Shows.findByIdAndUpdate({_id: input.id}, input, {new: true}, (err, show) => {
                     if (err) reject(err)
                     else resolve(show)
                 })
             })        
         },
         deleteShow: (root, {id}) => {
-            return new Promise((resolve, o) => {
+            return new Promise((resolve, reject) => {
                 Shows.deleteOne({_id: id}, (err) => {
                     if (err) reject(err)
                     else resolve('Show has been removed!')
